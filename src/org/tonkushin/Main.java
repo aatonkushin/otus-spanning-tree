@@ -12,7 +12,7 @@ public class Main {
         Graph graph = new Graph();
 
         Scanner scan = new Scanner(System.in);
-        System.out.println("Тест алгоритма Краскала");
+        System.out.println("Тест алгоритма поиска минимального остовного дерева");
         System.out.println("Введите количество рёбер");
         int e = scan.nextInt();             // количество рёбер
         System.out.println("Введите " + e + " названия вершин и их вес x, y, w");
@@ -25,12 +25,34 @@ public class Main {
         }
 
         System.out.println("Вес графа: " + graph.getWeight());
+        printVertexList(graph);
+        printEdgeList(graph);
+
+
+        Graph minGraph = new Graph();
+
+        graph.sortEdgeList();
+        for (Edge edge : graph.getEdgeList()) {
+            minGraph.addEdge(edge);
+
+            if (minGraph.isCyclic()) {
+                minGraph.removeEdge(edge);
+            }
+        }
+
+        System.out.println("Вес минимального остовного дерева: " + minGraph.getWeight());
+        printVertexList(minGraph);
+        printEdgeList(minGraph);
+    }
+
+    private static void printVertexList(Graph graph){
         System.out.println("Вершины: ");
         for (Vertex v : graph.getVertexList()) {
             System.out.println(v.toString() + ": " + v.getAdjacencyList());
         }
+    }
 
-        graph.sortEdgeList();
+    private static void printEdgeList(Graph graph) {
         System.out.println("Рёбра:");
         for (Edge edge : graph.getEdgeList()) {
             System.out.println(edge);

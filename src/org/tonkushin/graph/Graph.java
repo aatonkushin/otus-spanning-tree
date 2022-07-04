@@ -21,7 +21,7 @@ public class Graph {
     /**
      * Добавляет вершину в граф
      * @param v - вершина
-     * @return возращает добавленную или уже существующую вершину
+     * @return возвращает добавленную или уже существующую вершину
      */
     private Vertex addVertex(Vertex v) {
         if (!vertexList.contains(v)) {
@@ -33,7 +33,7 @@ public class Graph {
     }
 
     /**
-     * Добавляем ребро в граф
+     * Добавляет ребро в граф
      * @param vertex1Name название вершины 1
      * @param vertex2Name название вершины 2
      * @param weight вес ребра
@@ -43,7 +43,7 @@ public class Graph {
         Vertex vertex1 = new Vertex(vertex1Name);
         Vertex vertex2 = new Vertex(vertex2Name);
 
-        // Добаляем вершины в граф
+        // Добавляем вершины в граф
         Vertex v1 = this.addVertex(vertex1);
         Vertex v2 = this.addVertex(vertex2);
 
@@ -59,6 +59,30 @@ public class Graph {
 
         // Увеличиваем вес графа
         this.weight += weight;
+    }
+
+    /**
+     * Добавляет ребро в граф
+     * @param newEdge новое ребро
+     */
+    public void addEdge(Edge newEdge) {
+        addEdge(newEdge.vertex1.name, newEdge.vertex2.name, newEdge.weight);
+    }
+
+    public void removeEdge(Edge e) {
+        Edge edgeToRemove = null;
+
+        for (Edge edge : this.edgeList) {
+            if (edge.vertex1.equals(e.vertex1) && edge.vertex2.equals(e.vertex2) ) {
+                edgeToRemove = edge;
+            }
+        }
+
+        if (edgeToRemove != null && this.edgeList.remove(edgeToRemove)) {
+            edgeToRemove.vertex1.edges.remove(edgeToRemove);
+            edgeToRemove.vertex2.edges.remove(edgeToRemove);
+            this.weight -= e.weight;
+        }
     }
 
     /**
@@ -90,5 +114,44 @@ public class Graph {
      */
     public void sortEdgeList(){
         this.edgeList.sort(Edge::compareTo);
+    }
+
+    private boolean isCyclicUtil(Vertex v, List<Vertex> visited, Vertex parent) {
+        // Помечаем вершину посещённой
+        visited.add(v);
+
+        // Рекурсивно обходим все смежные вершины
+        for (Vertex v1 : v.getAdjacencyList()) {
+            // Если вершина ещё не посещена, то посещаем её
+            if (!visited.contains(v1)) {
+                if (isCyclicUtil(v1, visited, v)) {
+                    return true;
+                }
+                // Если вершина посещена и не является родительской, то присутствует цикл
+            } else if (v1 != parent) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Проверка графа на цикличность
+     * @return true - если граф цикличен
+     */
+    public boolean isCyclic() {
+        // Список посещённых вершин
+        List<Vertex> visited = new ArrayList<>();
+
+        for (Vertex v : this.vertexList) {
+            if (!visited.contains(v)) {
+                if (isCyclicUtil(v, visited, null)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
